@@ -5,11 +5,12 @@ import { Arrow } from "./ui";
 import { PRIVACY_URL } from "@/lib/legal";
 import { trackLead } from "@/lib/tracking";
 
-type Status = { kind: "idle" | "sending" | "ok" | "error"; title?: string; message?: string; field?: "email" | "privacy" };
+type Status = { kind: "idle" | "sending" | "ok" | "error"; title?: string; message?: string; field?: "email" | "phone" | "privacy" };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\+?[0-9\s]{8,16}$/;
 
-// Iscrizione veloce ad "Avvisami al lancio" direttamente dalla hero: solo email e consenso.
+// Iscrizione veloce ad "Avvisami al lancio" direttamente dalla hero: email, cellulare (obbligatorio dal 17/11/2026) e consenso.
 export default function HeroSignup() {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   // A ogni clic l'avviso riparte, così si vede una risposta anche se il messaggio è lo stesso.
@@ -36,6 +37,16 @@ export default function HeroSignup() {
       form.querySelector<HTMLInputElement>("#hs-email")?.focus();
       return;
     }
+    const phone = String(fd.get("phone") ?? "").trim();
+    if (!PHONE_RE.test(phone)) {
+      setStatus({
+        kind: "error",
+        field: "phone",
+        message: phone ? "Il numero di cellulare non sembra corretto." : "Lasciaci anche il tuo numero di cellulare.",
+      });
+      form.querySelector<HTMLInputElement>("#hs-phone")?.focus();
+      return;
+    }
     if (fd.get("privacy") !== "on") {
       setStatus({ kind: "error", field: "privacy", message: "Manca solo la spunta qui sotto: accetta l'informativa privacy." });
       return;
@@ -46,7 +57,7 @@ export default function HeroSignup() {
       const res = await fetch("/api/founder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: fd.get("email"), privacy: fd.get("privacy") === "on", source: "hero" }),
+        body: JSON.stringify({ email: fd.get("email"), phone, privacy: fd.get("privacy") === "on", source: "hero" }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -74,11 +85,15 @@ export default function HeroSignup() {
 
   return (
     <form className="hs" onSubmit={onSubmit} onChange={() => status.kind === "error" && setStatus({ kind: "idle" })} noValidate>
-      <div className={`hs-row ${status.field === "email" ? "is-missing" : ""}`}>
+      <div className={`hs-row ${status.field === "email" || status.field === "phone" ? "is-missing" : ""}`}>
         <label className="sr-only" htmlFor="hs-email">
           Email
         </label>
         <input id="hs-email" name="email" type="email" autoComplete="email" required placeholder="La tua email" />
+        <label className="sr-only" htmlFor="hs-phone">
+          Cellulare
+        </label>
+        <input id="hs-phone" name="phone" type="tel" autoComplete="tel" inputMode="tel" required placeholder="Cellulare" />
         <button className="btn btn--white" disabled={status.kind === "sending"} data-cursor="Dai!">
           {status.kind === "sending" ? "Un attimo…" : "Avvisami"} <Arrow className="btn-arrow" />
         </button>

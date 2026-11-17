@@ -115,7 +115,7 @@ export default function Hero() {
           <p className="hero-launch-title">Lo shop apre tra</p>
           <Countdown />
           <p className="hero-launch-text">
-            Lascia la tua email: <strong>ti avvisiamo appena apre lo shop</strong>.
+            Lascia email e cellulare: <strong>ti avvisiamo appena apre lo shop</strong>.
           </p>
           <HeroSignup />
           <div className="hero-launch-foot">

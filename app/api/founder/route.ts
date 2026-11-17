@@ -25,8 +25,8 @@ export async function POST(req: Request) {
   // Il nome serve nel form completo; dall'iscrizione veloce della hero arriva solo l'email.
   if (!name && body.source !== "hero") return NextResponse.json({ error: "Come ti chiami?" }, { status: 422 });
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "Controlla l'email." }, { status: 422 });
-  // Dal 12/11/2026 il modulo "Avvisami al lancio" chiede il cellulare, senza consenso WhatsApp a parte
-  if (!phone && body.source === "lancio")
+  // Cellulare obbligatorio: dal 12/11/2026 nel modulo "Avvisami al lancio", dal 17/11/2026 anche nella hero
+  if (!phone)
     return NextResponse.json({ error: "Lasciaci il tuo numero di cellulare." }, { status: 422 });
   if (phone && !PHONE_RE.test(phone))
     return NextResponse.json({ error: "Il numero di cellulare non sembra corretto." }, { status: 422 });

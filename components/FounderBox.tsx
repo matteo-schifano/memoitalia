@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Swoosh, Arrow } from "./ui";
 import { PRIVACY_URL } from "@/lib/legal";
+import { trackLead } from "@/lib/tracking";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -78,6 +79,7 @@ export default function FounderBox() {
         setStatus({ kind: "error", message: data.error ?? "Qualcosa non ha funzionato, riprova." });
         return;
       }
+      if (!data.alreadyIn) trackLead("lancio");
       setStatus({
         kind: "ok",
         title: data.alreadyIn ? "Ci sei già!" : "Congratulazioni!",

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Arrow } from "./ui";
 import { PRIVACY_URL } from "@/lib/legal";
+import { trackLead } from "@/lib/tracking";
 
 type Status = { kind: "idle" | "sending" | "ok" | "error"; title?: string; message?: string; field?: "email" | "privacy" };
 
@@ -52,6 +53,7 @@ export default function HeroSignup() {
         setStatus({ kind: "error", message: data.error ?? "Qualcosa non ha funzionato, riprova." });
         return;
       }
+      if (!data.alreadyIn) trackLead("hero");
       setStatus({
         kind: "ok",
         title: data.alreadyIn ? "Ci sei già!" : "Congratulazioni!",

@@ -866,6 +866,10 @@ p {
   font-weight: 400;
   font-size: 22px;
 }
+/* pulsante che porta al modulo completo «Avvisami al lancio» (17/11/2026) */
+.hero-launch-cta {
+  margin-top: 18px;
+}
 .hero-launch-foot {
   display: flex;
   flex-wrap: wrap;

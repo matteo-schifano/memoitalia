@@ -445,7 +445,7 @@ export default function Shop({ products, category }: { products: Product[]; cate
           <h2>
             Lo shop apre <span>a breve.</span>
           </h2>
-          <p>Lascia la tua email e ti avvisiamo appena puoi ordinare.</p>
+          <p>Lascia nome, email e cellulare e ti avvisiamo appena puoi ordinare.</p>
           <a href="/#founder" className="btn btn--white btn--lg" data-cursor="Iscriviti">
             Avvisami al lancio <Arrow className="btn-arrow" />
           </a>

@@ -7,7 +7,6 @@ import { useGSAP } from "@gsap/react";
 import { launchDateLabel } from "@/lib/launch";
 import { SplitChars, Swoosh, Arrow, Star } from "./ui";
 import Countdown from "./Countdown";
-import HeroSignup from "./HeroSignup";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -115,9 +114,12 @@ export default function Hero() {
           <p className="hero-launch-title">Lo shop apre tra</p>
           <Countdown />
           <p className="hero-launch-text">
-            Lascia email e cellulare: <strong>ti avvisiamo appena apre lo shop</strong>.
+            Lascia nome, email e cellulare: <strong>ti avvisiamo appena apre lo shop</strong>.
           </p>
-          <HeroSignup />
+          {/* Dal 17/11/2026 niente modulo veloce qui: si va al modulo completo (nome, email, cellulare) */}
+          <a href="#founder" className="btn btn--white btn--lg hero-launch-cta" data-cursor="Iscriviti">
+            Avvisami al lancio <Arrow className="btn-arrow" />
+          </a>
           <div className="hero-launch-foot">
             <a href="#gusti" className="hero-link" data-cursor="Scopri">
               Intanto scopri i gusti <Arrow className="btn-arrow" />

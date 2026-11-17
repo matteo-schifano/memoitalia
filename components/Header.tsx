@@ -52,7 +52,7 @@ export default function Header() {
         <div className="topbar-track">
           {Array.from({ length: 2 }).map((_, k) => (
             <div className="topbar-group" key={k} aria-hidden={k > 0}>
-              <span>Lo shop apre a breve: lascia la tua email e ti avvisiamo al lancio</span>
+              <span>Lo shop apre a breve: lascia i tuoi contatti e ti avvisiamo al lancio</span>
               <Star className="topbar-star" />
               <span>Spedizioni in tutta Italia</span>
               <Star className="topbar-star" />

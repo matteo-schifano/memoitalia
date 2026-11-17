@@ -6,7 +6,7 @@ import { CartProvider } from "@/components/CartProvider";
 import SmoothScroll from "@/components/SmoothScroll";
 import Script from "next/script";
 import { IUBENDA_BANNER_SRC } from "@/lib/legal";
-import MetaPixel from "@/components/MetaPixel";
+import Tracking from "@/components/Tracking";
 
 const bomega = localFont({
   src: "../public/fonts/Bomega.woff2",
@@ -52,8 +52,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* banner dei cookie di iubenda. Si carica dopo React: caricato prima, modifica la pagina
             (attributi data-cmp-info) e React segnala un errore. Gli strumenti che tracciano
             (Analytics, Pixel) vanno accesi solo dopo il consenso, non bloccati da questo script. */}
-        {/* Meta Pixel: parte solo dopo il consenso «marketing» nel banner (components/MetaPixel.tsx) */}
-        <MetaPixel />
+        {/* Google Analytics e Meta Pixel: partono solo dopo il consenso nel banner (components/Tracking.tsx) */}
+        <Tracking />
         <Script src={IUBENDA_BANNER_SRC} strategy="afterInteractive" />
         <CartProvider>
           <SmoothScroll />

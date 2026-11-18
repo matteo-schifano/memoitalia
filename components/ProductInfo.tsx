@@ -33,8 +33,9 @@ export default function ProductInfo({ product, onClose }: { product: Product | n
   const open = !!product;
   const supplement = product?.kind === "integratore";
   // i dati del pannello hanno la precedenza; quelli in codice restano come riserva
-  const label = product?.label?.ingredients ? product.label : product ? getLabel(product.id) : undefined;
+  // i dati di etichetta stanno solo in codice (lib/labels.ts), non nel pannello
   const local = product ? getLabel(product.id) : undefined;
+  const label = local;
 
   useEffect(() => {
     if (!open) return;

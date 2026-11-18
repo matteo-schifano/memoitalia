@@ -5428,7 +5428,7 @@ p {
 }
 .co-form { display: flex; flex-direction: column; gap: 28px; }
 .co-block { border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-.co-block legend { padding: 0; margin-bottom: 14px; font-family: var(--font-display); font-size: 22px; color: var(--blue); }
+.co-block legend { padding: 0; margin-bottom: 14px; font-family: var(--font-display); font-weight: 400; font-size: 24px; line-height: 1; text-transform: uppercase; color: var(--blue); }
 .co-row-3 { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 14px; }
 .co-muted { margin: 0; font-size: 14px; opacity: .7; }
 .co-option { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 2px solid rgba(11, 78, 162, .18); border-radius: 16px; background: var(--white); cursor: pointer; transition: border-color .2s; }
@@ -5436,9 +5436,12 @@ p {
 .co-option input { flex: none; width: 18px; height: 18px; accent-color: var(--blue); }
 .co-option span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .co-option small { font-size: 13px; opacity: .7; }
+/* Privato / Azienda: due scelte affiancate anche su telefono */
+.cf-row.co-kind { grid-template-columns: 1fr 1fr; gap: 10px; }
+.co-kind .co-option { padding: 12px 14px; }
 .co-consents { gap: 10px; }
 .co-card { background: var(--white); border-radius: var(--radius); padding: clamp(20px, 3vw, 32px); min-width: 0; }
-.co-card h2 { margin: 0 0 14px; font-family: var(--font-display); font-size: 24px; color: var(--blue); }
+.co-card h2 { margin: 0 0 14px; font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--blue); }
 .co-summary { position: sticky; top: calc(var(--topbar) + 110px); }
 .co-lines { list-style: none; margin: 0; padding: 0; }
 .co-lines li { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(17, 26, 51, .1); }

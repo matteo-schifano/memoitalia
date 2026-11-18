@@ -35,7 +35,7 @@ export type Product = {
     contains: string[];
     traces: string[];
     storage: string;
-    nutrition: { label: string; per100: string; perBar: string; sub?: boolean }[];
+    nutrition?: { label: string; per100: string; perBar: string; sub?: boolean }[];
     usage?: string;
     warnings?: string;
     claim?: string;

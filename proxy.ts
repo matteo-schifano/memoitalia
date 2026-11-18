@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SHOP_OPEN } from "./lib/shop";
+import { PREVIEW_COOKIE, SHOP_OPEN, previewCode } from "./lib/shop";
 
 // Cosa si vede sul dominio del cliente (memoitalia.it e www):
 //   "tutto"        → tutto il sito (dal 12/11/2026), shop compreso solo se SHOP_OPEN (lib/shop.ts)
@@ -12,6 +12,7 @@ const DOMAIN_MODE = "tutto" as "tutto" | "home" | "costruzione";
 const DOMAIN_HOSTS = new Set(["memoitalia.it", "www.memoitalia.it"]);
 // Pagine dello shop: con lo shop chiuso rimandano alla home, su ogni indirizzo
 const SHOP_PATHS = /^\/(shop|checkout|ordine)(\/|$)/;
+const ORDER_PATH = /^\/ordine\/[0-9a-f-]{36}$/i;
 
 export function proxy(request: NextRequest) {
   const host = (request.headers.get("host") ?? "").split(":")[0].toLowerCase();
@@ -23,7 +24,12 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 307);
   };
 
-  if (!SHOP_OPEN && SHOP_PATHS.test(pathname)) return toHome();
+  // con lo shop chiuso passa solo chi ha il link segreto dell'anteprima (lib/shop.ts, app/anteprima)
+  const code = previewCode();
+  const preview = Boolean(code) && request.cookies.get(PREVIEW_COOKIE)?.value === code;
+  // /ordine/<token> resta aperta a chi ha il link dell'ordine (email di conferma, anche da un altro telefono):
+  // il token lungo e casuale basta a proteggerla, e senza backend la pagina non trova nulla
+  if (!SHOP_OPEN && !preview && SHOP_PATHS.test(pathname) && !ORDER_PATH.test(pathname)) return toHome();
   if (!DOMAIN_HOSTS.has(host) || DOMAIN_MODE === "tutto") return NextResponse.next();
 
   if (DOMAIN_MODE === "costruzione") {

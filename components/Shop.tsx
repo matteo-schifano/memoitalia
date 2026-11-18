@@ -49,7 +49,7 @@ const perBar = (p: Product) => formatPrice(Math.round(p.priceCents / (p.packSize
 
 export default function Shop({ products, category }: { products: Product[]; category?: ShopCategory }) {
   const root = useRef<HTMLDivElement>(null);
-  const { add } = useCart();
+  const { add, checkoutEnabled } = useCart();
   const [qty, setQty] = useState<Record<string, number>>({});
   const [added, setAdded] = useState<string | null>(null);
   const [info, setInfo] = useState<ProductId | null>(null);
@@ -439,8 +439,8 @@ export default function Shop({ products, category }: { products: Product[]; cate
         </div>
       </section>}
 
-      {/* Avvisami al lancio */}
-      <section className="sh-founder">
+      {/* Avvisami al lancio: serve solo finché non si può ordinare */}
+      {!checkoutEnabled && <section className="sh-founder">
         <div className="container sh-founder-inner">
           <h2>
             Lo shop apre <span>a breve.</span>
@@ -450,7 +450,7 @@ export default function Shop({ products, category }: { products: Product[]; cate
             Avvisami al lancio <Arrow className="btn-arrow" />
           </a>
         </div>
-      </section>
+      </section>}
     </div>
   );
 }

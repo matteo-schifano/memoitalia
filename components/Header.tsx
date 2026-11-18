@@ -4,23 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useCart } from "./CartProvider";
 import { Star } from "./ui";
-import { SHOP_OPEN } from "@/lib/shop";
+import { useShopOpen } from "@/lib/useShopOpen";
+
+type NavItem = { href: string; label: string; sub?: { href: string; label: string }[] };
 
 // "Avvisami al lancio" ha già il suo pulsante a destra, quindi non sta nel menu.
-// Con lo shop chiuso (lib/shop.ts) spariscono la voce Shop e il carrello.
-const NAV: { href: string; label: string; sub?: { href: string; label: string }[] }[] = [
-  ...(SHOP_OPEN
-    ? [
-        {
-          href: "/shop",
-          label: "Shop",
-          sub: [
-            { href: "/shop/barrette", label: "Barrette" },
-            { href: "/shop/integratore", label: "Integratore" },
-          ],
-        },
-      ]
-    : []),
+// Con lo shop chiuso (lib/shop.ts) spariscono la voce Shop e il carrello, tranne nell'anteprima col link segreto.
+const SHOP_NAV: NavItem = {
+  href: "/shop",
+  label: "Shop",
+  sub: [
+    { href: "/shop/barrette", label: "Barrette" },
+    { href: "/shop/integratore", label: "Integratore" },
+  ],
+};
+const PAGES_NAV: NavItem[] = [
   { href: "/chi-siamo", label: "Chi siamo" },
   { href: "/faq", label: "FAQ" },
   { href: "/contatti", label: "Contatti" },
@@ -28,6 +26,8 @@ const NAV: { href: string; label: string; sub?: { href: string; label: string }[
 
 export default function Header() {
   const { count, setOpen, bump } = useCart();
+  const shopOpen = useShopOpen();
+  const NAV = shopOpen ? [SHOP_NAV, ...PAGES_NAV] : PAGES_NAV;
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const badge = useRef<HTMLSpanElement>(null);
@@ -93,7 +93,7 @@ export default function Header() {
           <a href="/#founder" className="btn btn--blue btn--sm header-cta" data-cursor="Iscriviti">
             Avvisami al lancio
           </a>
-          {SHOP_OPEN && (
+          {shopOpen && (
             <button className="cart-btn" onClick={() => setOpen(true)} aria-label={`Apri il carrello, ${count} articoli`} data-cursor="Carrello">
               <svg viewBox="0 0 24 24" aria-hidden>
                 <path fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8Zm4 0V6a3 3 0 0 1 6 0v2" />

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { formatPrice, products } from "@/lib/catalog";
+import { formatPrice } from "@/lib/catalog";
 import { useCart } from "./CartProvider";
 
 export default function CartDrawer() {
-  const { lines, open, setOpen, setQty, totalCents, count } = useCart();
+  const { lines, open, setOpen, setQty, totalCents, count, products, checkoutEnabled } = useCart();
 
   useEffect(() => {
     if (open) window.__lenis?.stop();
@@ -66,12 +66,20 @@ export default function CartDrawer() {
                 <span>Totale · {count} {count === 1 ? "articolo" : "articoli"}</span>
                 <strong>{formatPrice(totalCents)}</strong>
               </div>
-              <button className="btn btn--blue btn--lg btn--full" disabled>
-                Checkout in arrivo
-              </button>
-              <p className="drawer-note">
-                Lo shop apre a breve. <a href="/#founder" onClick={() => setOpen(false)}>Lascia i tuoi contatti</a> e ti avvisiamo al lancio.
-              </p>
+              {checkoutEnabled ? (
+                <a className="btn btn--blue btn--lg btn--full" href="/checkout" data-cursor="Cassa">
+                  Vai alla cassa
+                </a>
+              ) : (
+                <>
+                  <button className="btn btn--blue btn--lg btn--full" disabled>
+                    Checkout in arrivo
+                  </button>
+                  <p className="drawer-note">
+                    Lo shop apre a breve. <a href="/#founder" onClick={() => setOpen(false)}>Lascia i tuoi contatti</a> e ti avvisiamo al lancio.
+                  </p>
+                </>
+              )}
             </div>
           </>
         )}

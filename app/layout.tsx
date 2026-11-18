@@ -4,6 +4,7 @@ import { Archivo } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/CartProvider";
 import SmoothScroll from "@/components/SmoothScroll";
+import { backendEnabled, getCatalog } from "@/lib/backend";
 import Script from "next/script";
 import { IUBENDA_BANNER_SRC } from "@/lib/legal";
 import Tracking from "@/components/Tracking";
@@ -45,7 +46,8 @@ export const viewport: Viewport = {
   themeColor: "#0b4ea2",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const products = await getCatalog();
   return (
     <html lang="it" className={`${bomega.variable} ${archivo.variable}`}>
       <body>
@@ -55,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Google Analytics e Meta Pixel: partono solo dopo il consenso nel banner (components/Tracking.tsx) */}
         <Tracking />
         <Script src={IUBENDA_BANNER_SRC} strategy="afterInteractive" />
-        <CartProvider>
+        <CartProvider products={products} checkoutEnabled={backendEnabled}>
           <SmoothScroll />
           {children}
         </CartProvider>

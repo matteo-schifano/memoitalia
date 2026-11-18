@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { products, type ProductId } from "@/lib/catalog";
+import type { Product, ProductId } from "@/lib/catalog";
 
 type Line = { id: ProductId; qty: number };
 
@@ -14,14 +14,20 @@ type CartCtx = {
   add: (id: ProductId, qty?: number) => void;
   setQty: (id: ProductId, qty: number) => void;
   bump: number;
+  products: Product[];
+  checkoutEnabled: boolean;
+  /** il carrello salvato è stato letto: prima di allora "vuoto" non vuol dire vuoto */
+  ready: boolean;
+  clear: () => void;
 };
 
 const Ctx = createContext<CartCtx | null>(null);
-// v2: le barrette sono in box da 12, i carrelli salvati prima contavano barrette singole
+// v2: dal 4/11/2026 le barrette sono in box da 12, i carrelli salvati prima contavano barrette singole
 const KEY = "memo-cart-v2";
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [lines, setLines] = useState<Line[]>([]);
+export function CartProvider({ children, products, checkoutEnabled }: { children: React.ReactNode; products: Product[]; checkoutEnabled: boolean }) {
+  const [savedLines, setLines] = useState<Line[]>([]);
+  const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
   const [bump, setBump] = useState(0);
 
@@ -30,13 +36,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const raw = localStorage.getItem(KEY);
       if (raw) setLines(JSON.parse(raw));
     } catch {}
+    setReady(true);
   }, []);
 
   useEffect(() => {
+    // non scrive prima di aver letto, altrimenti cancellerebbe il carrello salvato
+    if (!ready) return;
     try {
-      localStorage.setItem(KEY, JSON.stringify(lines));
+      localStorage.setItem(KEY, JSON.stringify(savedLines));
     } catch {}
-  }, [lines]);
+  }, [savedLines, ready]);
+
+  const clear = useCallback(() => setLines([]), []);
 
   const add = useCallback((id: ProductId, qty = 1) => {
     setLines((prev) => {
@@ -52,10 +63,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(() => {
+    // un prodotto tolto dal catalogo non deve restare nel conto
+    const lines = savedLines.filter((l) => products.some((p) => p.id === l.id));
     const count = lines.reduce((s, l) => s + l.qty, 0);
     const totalCents = lines.reduce((s, l) => s + l.qty * (products.find((p) => p.id === l.id)?.priceCents ?? 0), 0);
-    return { lines, count, totalCents, open, setOpen, add, setQty, bump };
-  }, [lines, open, add, setQty, bump]);
+    return { lines, count, totalCents, open, setOpen, add, setQty, bump, products, checkoutEnabled, ready, clear };
+  }, [savedLines, open, add, setQty, bump, products, checkoutEnabled, ready, clear]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -1,4 +1,4 @@
-import { products } from "@/lib/catalog";
+import { getCatalog } from "@/lib/backend";
 import Header from "./Header";
 import Shop, { type ShopCategory } from "./Shop";
 import Footer from "./Footer";
@@ -7,7 +7,8 @@ import Cursor from "./Cursor";
 import ShopCartBar from "./ShopCartBar";
 
 // La stessa struttura per lo shop completo e per le pagine Barrette e Integratore.
-export default function ShopView({ category }: { category?: ShopCategory }) {
+export default async function ShopView({ category }: { category?: ShopCategory }) {
+  const products = await getCatalog();
   return (
     <>
       <Cursor />

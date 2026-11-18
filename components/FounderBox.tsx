@@ -129,7 +129,7 @@ export default function FounderBox() {
               <label className="check">
                 <input type="checkbox" name="privacy" required />
                 <span>
-                  Ho letto l'<a href={PRIVACY_URL} target="_blank" rel="noopener">informativa privacy</a> e voglio ricevere novità da Mèmo.
+                  Ho letto l'<a href={PRIVACY_URL} target="_blank" rel="noopener">informativa privacy</a> e voglio ricevere novità da Mèmo via email, SMS e WhatsApp.
                 </span>
               </label>
               <button className="btn btn--white btn--lg" disabled={status.kind === "sending"} data-cursor="Dai!">

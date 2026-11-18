@@ -106,7 +106,7 @@ export default function HeroSignup() {
       <label className={`hs-check ${status.field === "privacy" ? "is-missing" : ""}`}>
         <input type="checkbox" name="privacy" required />
         <span>
-          Accetto l'<a href={PRIVACY_URL} target="_blank" rel="noopener">informativa privacy</a> e voglio ricevere novità da Mèmo.
+          Accetto l'<a href={PRIVACY_URL} target="_blank" rel="noopener">informativa privacy</a> e voglio ricevere novità da Mèmo via email, SMS e WhatsApp.
         </span>
       </label>
     </form>

@@ -62,7 +62,7 @@ export const products: Product[] = [
     image: "/img/products/golosa.webp",
     boxImage: "/img/products/box-golosa.webp",
     theme: { bg: "#3a1d12", ink: "#fff3e4", accent: "#f2b66d" },
-    badge: "La più golosa",
+    badge: "La più richiesta",
   },
   {
     id: "cocco",

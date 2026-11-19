@@ -5409,9 +5409,10 @@ p {
     border-radius: 0;
   }
 }
-/* su telefoni con schermo basso il link alle informazioni nei Gusti lascerebbe poco spazio */
+/* su telefoni con schermo basso il link alle informazioni nei Gusti si toglie solo a shop aperto,
+   quando sotto c'è anche il pulsante «Scopri nello shop»; a shop chiuso lo spazio basta (provato fino a 375x568) */
 @media (max-width: 720px) and (max-height: 800px) {
-  .fl-info {
+  .fl-copy:has(.fl-buy) .fl-info {
     display: none;
   }
 }

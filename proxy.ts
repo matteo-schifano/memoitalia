@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { PREVIEW_COOKIE, SHOP_OPEN, previewCode } from "./lib/shop";
+import { PREVIEW_COOKIE, SHOP_OPEN, previewCode, setPreviewCookies } from "./lib/shop";
 
 // Cosa si vede sul dominio del cliente (memoitalia.it e www):
 //   "tutto"        → tutto il sito (dal 12/11/2026), shop compreso solo se SHOP_OPEN (lib/shop.ts)
@@ -26,6 +26,15 @@ export function proxy(request: NextRequest) {
 
   // con lo shop chiuso passa solo chi ha il link segreto dell'anteprima (lib/shop.ts, app/anteprima)
   const code = previewCode();
+  // link per gli amici: /shop?codice=… (20/11/2026). Apre subito la pagina e salva l'anteprima nel browser,
+  // senza passare da un rimando: alcuni amici che avevano già visitato il sito non vedevano lo shop
+  const fromLink = Boolean(code) && request.nextUrl.searchParams.get("codice")?.trim() === code;
+  if (fromLink && (!DOMAIN_HOSTS.has(host) || DOMAIN_MODE === "tutto")) {
+    const res = NextResponse.next();
+    setPreviewCookies(res.cookies, code, request.nextUrl.protocol === "https:");
+    res.headers.set("X-Robots-Tag", "noindex");
+    return res;
+  }
   const preview = Boolean(code) && request.cookies.get(PREVIEW_COOKIE)?.value === code;
   // /ordine/<token> resta aperta a chi ha il link dell'ordine (email di conferma, anche da un altro telefono):
   // il token lungo e casuale basta a proteggerla, e senza backend la pagina non trova nulla

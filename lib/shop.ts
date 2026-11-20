@@ -11,3 +11,12 @@ export const PREVIEW_COOKIE = "memo-anteprima"; // contiene il codice, illeggibi
 export const PREVIEW_FLAG_COOKIE = "memo-shop"; // "1": serve solo a mostrare Shop e carrello nell'header
 export const PREVIEW_DAYS = 60;
 export const previewCode = () => process.env.SHOP_PREVIEW_CODE?.trim() ?? "";
+
+// Cookie dell'anteprima, messi sia da /anteprima sia da proxy.ts quando il codice arriva nell'indirizzo
+// (link diretto /shop?codice=…, 20/11/2026: non dipende da un rimando, che qualche browser saltava).
+type CookieJar = { set: (name: string, value: string, options: Record<string, unknown>) => unknown };
+export function setPreviewCookies(cookies: CookieJar, code: string, secure: boolean) {
+  const opts = { path: "/", sameSite: "lax" as const, secure, maxAge: PREVIEW_DAYS * 86400 };
+  cookies.set(PREVIEW_COOKIE, code, { ...opts, httpOnly: true });
+  cookies.set(PREVIEW_FLAG_COOKIE, "1", opts);
+}

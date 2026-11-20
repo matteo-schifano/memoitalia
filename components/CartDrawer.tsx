@@ -67,8 +67,8 @@ export default function CartDrawer() {
                 <strong>{formatPrice(totalCents)}</strong>
               </div>
               {checkoutEnabled ? (
-                <a className="btn btn--blue btn--lg btn--full" href="/checkout" data-cursor="Cassa">
-                  Vai alla cassa
+                <a className="btn btn--blue btn--lg btn--full" href="/checkout" data-cursor="Carrello">
+                  Vai al carrello
                 </a>
               ) : (
                 <>

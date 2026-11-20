@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Arrow } from "./ui";
 import { PRIVACY_URL } from "@/lib/legal";
 
@@ -8,10 +8,17 @@ type Status = { kind: "idle" } | { kind: "sending" } | { kind: "ok" } | { kind: 
 
 const BUSINESSES = ["Supermercato / GDO", "Negozio di alimentari", "Bar o caffetteria", "Palestra o club sportivo", "Altro"];
 
-// Un solo modulo per due usi: messaggi dei privati e richieste dei rivenditori.
-export default function ContactForm({ kind }: { kind: "privato" | "rivenditore" }) {
+// Un solo modulo per tre usi: messaggi dei privati, richieste dei rivenditori e, arrivando da «Collabora con noi»
+// (/contatti?tipo=collabora#scrivici, 20/11/2026), proposte di collaborazione: nel pannello finiscono in sezioni diverse.
+export default function ContactForm({ kind: baseKind }: { kind: "privato" | "rivenditore" }) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const shop = kind === "rivenditore";
+  const [collab, setCollab] = useState(false);
+  const shop = baseKind === "rivenditore";
+  const kind = collab ? "collaboratore" : baseKind;
+
+  useEffect(() => {
+    if (!shop && new URLSearchParams(window.location.search).get("tipo") === "collabora") setCollab(true);
+  }, [shop]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,13 +52,21 @@ export default function ContactForm({ kind }: { kind: "privato" | "rivenditore" 
     return (
       <div className="cf-done" role="status">
         <strong>Messaggio arrivato!</strong>
-        <p>{shop ? "Grazie per l'interesse: ti ricontattiamo per parlarne insieme." : "Grazie, ti rispondiamo il prima possibile."}</p>
+        <p>{shop || collab ? "Grazie per l'interesse: ti ricontattiamo per parlarne insieme." : "Grazie, ti rispondiamo il prima possibile."}</p>
       </div>
     );
   }
 
   return (
     <form className="cf" onSubmit={onSubmit} noValidate>
+      {collab && (
+        <p className="cf-collab">
+          <strong>Proposta di collaborazione.</strong> Raccontaci chi sei e cosa hai in mente.{" "}
+          <button type="button" onClick={() => setCollab(false)}>
+            Non è una collaborazione?
+          </button>
+        </p>
+      )}
       {shop && (
         <div className="cf-row">
           <label className="cf-field">
@@ -93,9 +108,20 @@ export default function ContactForm({ kind }: { kind: "privato" | "rivenditore" 
           </label>
         </div>
       )}
+      {collab && (
+        <label className="cf-field">
+          <span>Telefono (facoltativo)</span>
+          <input name="phone" type="tel" autoComplete="tel" placeholder="+39 333 000 0000" />
+        </label>
+      )}
       <label className="cf-field">
         <span>{shop ? "Messaggio (facoltativo)" : "Messaggio"}</span>
-        <textarea name="message" rows={5} required={!shop} placeholder={shop ? "Raccontaci la tua attività" : "Come possiamo aiutarti?"} />
+        <textarea
+          name="message"
+          rows={5}
+          required={!shop}
+          placeholder={shop ? "Raccontaci la tua attività" : collab ? "Chi sei (academy, società, allenatore, palestra…) e che collaborazione proponi" : "Come possiamo aiutarti?"}
+        />
       </label>
       <label className="cf-check">
         <input type="checkbox" name="privacy" required />
@@ -104,7 +130,7 @@ export default function ContactForm({ kind }: { kind: "privato" | "rivenditore" 
         </span>
       </label>
       <button className="btn btn--blue btn--lg" disabled={status.kind === "sending"} data-cursor="Invia">
-        {status.kind === "sending" ? "Un attimo…" : shop ? "Richiedi informazioni" : "Invia messaggio"} <Arrow className="btn-arrow" />
+        {status.kind === "sending" ? "Un attimo…" : shop ? "Richiedi informazioni" : collab ? "Proponi la collaborazione" : "Invia messaggio"} <Arrow className="btn-arrow" />
       </button>
       {status.kind === "error" && (
         <p className="cf-error" role="alert">

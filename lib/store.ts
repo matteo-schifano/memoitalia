@@ -50,7 +50,7 @@ export async function addFounder(input: Omit<FounderSignup, "id" | "createdAt">)
 
 export type ContactMessage = {
   id: string;
-  kind: "privato" | "rivenditore";
+  kind: "privato" | "rivenditore" | "collaboratore";
   name: string;
   email: string;
   phone?: string;

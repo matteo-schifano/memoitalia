@@ -171,7 +171,7 @@ export default function ChiSiamoPage() {
                 <h3>Vuoi entrare in squadra?</h3>
                 <p>Academy, società sportive, allenatori e professionisti, scuole di padel, palestre o eventi: se anche tu credi in uno spuntino buono e semplice, scrivici e costruiamo qualcosa insieme.</p>
               </div>
-              <a href="/contatti#scrivici" className="btn btn--blue" data-cursor="Scrivici">
+              <a href="/contatti?tipo=collabora#scrivici" className="btn btn--blue" data-cursor="Scrivici">
                 Collabora con noi <Arrow className="btn-arrow" />
               </a>
             </div>

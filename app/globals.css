@@ -5116,6 +5116,26 @@ p {
   font-weight: 700;
   color: #c0392b;
 }
+/* arrivando da «Collabora con noi» (20/11/2026) */
+.cf-collab {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--sky-soft);
+  color: var(--blue);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.cf-collab button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
 .cf-done {
   padding: 26px;
   border-radius: 20px;

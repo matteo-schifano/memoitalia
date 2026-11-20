@@ -38,5 +38,8 @@ export function privateCheckout(cookies: CookieReader) {
   const preview = previewCode();
   const test = Boolean(secret) && cookies.get(TEST_PAYMENT_COOKIE)?.value === secret;
   const friend = Boolean(preview) && cookies.get(PREVIEW_COOKIE)?.value === preview;
-  return { secret, test, cod: Boolean(secret) && (friend || test) };
+  // «Paga alla consegna» SPENTO il 20/11/2026 su richiesta dell'utente («togli subito il contrassegno»):
+  // non compare in cassa e app/api/orders lo rifiuta. Per riaccenderlo: cod: Boolean(secret) && (friend || test)
+  void friend;
+  return { secret, test, cod: false };
 }

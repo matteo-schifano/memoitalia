@@ -43,7 +43,7 @@ export async function getCatalog(): Promise<Product[]> {
 
 // Inoltra una richiesta del browser al backend e ne restituisce la risposta.
 // L'indirizzo del cliente va passato, altrimenti i limiti di richieste varrebbero per tutti insieme.
-export async function forwardToBackend(path: string, req: Request, body?: unknown, unavailable = "Il negozio non è raggiungibile, riprova tra poco.") {
+export async function forwardToBackend(path: string, req: Request, body?: unknown, unavailable = "Il negozio non è raggiungibile, riprova tra poco.", extraHeaders: Record<string, string> = {}) {
   if (!BASE) return NextResponse.json({ error: unavailable }, { status: 503 });
   try {
     const res = await fetch(`${BASE}/api/v1${path}`, {
@@ -51,6 +51,7 @@ export async function forwardToBackend(path: string, req: Request, body?: unknow
       headers: {
         "Content-Type": "application/json",
         "X-Forwarded-For": req.headers.get("x-forwarded-for") ?? "",
+        ...extraHeaders,
       },
       body: body === undefined ? undefined : JSON.stringify(body),
       cache: "no-store",

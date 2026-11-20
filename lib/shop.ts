@@ -20,3 +20,23 @@ export function setPreviewCookies(cookies: CookieJar, code: string, secure: bool
   cookies.set(PREVIEW_COOKIE, code, { ...opts, httpOnly: true });
   cookies.set(PREVIEW_FLAG_COOKIE, "1", opts);
 }
+
+// PROVVISORIO (20/11/2026): «pagamento di prova» per provare tutto il percorso d'acquisto senza carta.
+// Si accende aprendo /prova-pagamento?codice=<CHECKOUT_PRIVATE_SECRET> (variabile solo server, uguale sul backend):
+// da quel browser in cassa compare «Pagamento di prova». Gli amici col link dell'anteprima non lo vedono.
+// Da togliere prima del lancio (basta togliere la variabile su Vercel e Railway).
+export const TEST_PAYMENT_COOKIE = "memo-prova";
+export const privateCheckoutSecret = () => process.env.CHECKOUT_PRIVATE_SECRET?.trim() ?? "";
+
+// Cassa privata (20/11/2026), da usare solo sul server: cosa può usare questo browser in cassa.
+// - test: «Pagamento di prova» (link /prova-pagamento);
+// - cod: «Paga alla consegna» (contrassegno), per chi ha il link degli amici (o quello di prova).
+// Il backend li accetta solo con il segreto CHECKOUT_PRIVATE_SECRET, che aggiunge app/api/orders.
+type CookieReader = { get: (name: string) => { value: string } | undefined };
+export function privateCheckout(cookies: CookieReader) {
+  const secret = privateCheckoutSecret();
+  const preview = previewCode();
+  const test = Boolean(secret) && cookies.get(TEST_PAYMENT_COOKIE)?.value === secret;
+  const friend = Boolean(preview) && cookies.get(PREVIEW_COOKIE)?.value === preview;
+  return { secret, test, cod: Boolean(secret) && (friend || test) };
+}

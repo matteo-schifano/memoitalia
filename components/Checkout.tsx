@@ -18,15 +18,29 @@ const CARD = {
   note: "Carta, Apple Pay, Google Pay o Satispay, sulla pagina sicura di Stripe.",
 };
 
+// Paga alla consegna (contrassegno GLS, 20/11/2026): solo per chi ha il link degli amici.
+const COD = {
+  id: "contrassegno",
+  label: "Paga alla consegna",
+  note: "In contanti al corriere GLS quando ricevi il pacco.",
+};
+
+// PROVVISORIO (20/11/2026): solo per chi ha aperto il link di prova. L'ordine è «di prova» e si annulla da solo.
+const TEST = {
+  id: "prova",
+  label: "Pagamento di prova",
+  note: "Solo per le prove: non paghi nulla, l'ordine è finto e si annulla da solo dopo 30 minuti.",
+};
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function Checkout() {
+export default function Checkout({ testPayment = false, codPayment = false }: { testPayment?: boolean; codPayment?: boolean }) {
   const { lines, products, totalCents: subtotal, ready, clear } = useCart();
   const [rates, setRates] = useState<Rate[] | null>(null);
   const [rateId, setRateId] = useState<number | null>(null);
   const [cardEnabled, setCardEnabled] = useState(false);
   const [payment, setPayment] = useState(CARD.id);
-  const payments = cardEnabled ? [CARD] : [];
+  const payments = [...(cardEnabled ? [CARD] : []), ...(codPayment ? [COD] : []), ...(testPayment ? [TEST] : [])];
   const [company, setCompany] = useState(false);
   const [sameAddress, setSameAddress] = useState(true);
   const [codeInput, setCodeInput] = useState("");
@@ -423,7 +437,7 @@ export default function Checkout() {
         </div>
 
         <button className="btn btn--blue btn--lg btn--full" disabled={sending || payments.length === 0} data-cursor="Ordina">
-          {sending ? "Un attimo…" : `${payment === CARD.id ? "Vai al pagamento" : "Conferma l'ordine"} · ${formatPrice(total)}`} {!sending && <Arrow className="btn-arrow" />}
+          {sending ? "Un attimo…" : `${payment === CARD.id ? "Vai al pagamento" : payment === TEST.id ? "Conferma l'ordine di prova" : "Conferma l'ordine"} · ${formatPrice(total)}`} {!sending && <Arrow className="btn-arrow" />}
         </button>
         {error && (
           <p className="cf-error" role="alert">

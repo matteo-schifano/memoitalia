@@ -31,6 +31,9 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
   const order = await getOrder(token);
   if (!order) notFound();
 
+  // ordine appena concluso: pagato online, oppure da pagare alla consegna (contrassegno, 20/11/2026).
+  // Solo allora si svuota il carrello e parte l'evento Acquisto (una volta per ordine).
+  const confirmed = pagamento === "ok" && (order.paymentStatus === "paid" || (order.paymentMethod === "contrassegno" && order.status !== "cancelled"));
   const unpaid = order.paymentStatus === "pending" || order.paymentStatus === "partial";
   const awaiting = order.status === "awaiting";
   const cancelled = order.status === "cancelled";
@@ -45,7 +48,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
       <Cursor />
       <Header />
       <main className="page">
-        {pagamento === "ok" && order.paymentStatus === "paid" && (
+        {confirmed && (
           <>
             <ClearCart />
             <TrackPurchase
@@ -121,7 +124,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
             {unpaid && order.paymentMethod === "contrassegno" && (
               <div className="co-step">
                 <strong>Paghi alla consegna</strong>
-                <p>Tieni pronti {formatPrice(order.totalCents)} per il corriere.</p>
+                <p>Tieni pronti {formatPrice(order.totalCents)} in contanti per il corriere GLS.</p>
               </div>
             )}
             {awaiting || cancelled ? null : order.shipments.length > 0 ? (

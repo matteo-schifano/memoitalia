@@ -11,8 +11,10 @@ const DOMAIN_MODE = "tutto" as "tutto" | "home" | "costruzione";
 
 const DOMAIN_HOSTS = new Set(["memoitalia.it", "www.memoitalia.it"]);
 // Pagine dello shop: con lo shop chiuso rimandano alla home, su ogni indirizzo
-const SHOP_PATHS = /^\/(shop|checkout|ordine)(\/|$)/;
+const SHOP_PATHS = /^\/(shop|checkout|ordine|account)(\/|$)/;
 const ORDER_PATH = /^\/ordine\/[0-9a-f-]{36}$/i;
+// link delle email dell'area utente (conferma e nuova password): aperti anche a shop chiuso, come l'ordine
+const ACCOUNT_LINK = /^\/account\/(conferma|password)$/;
 
 export function proxy(request: NextRequest) {
   const host = (request.headers.get("host") ?? "").split(":")[0].toLowerCase();
@@ -38,7 +40,11 @@ export function proxy(request: NextRequest) {
   const preview = Boolean(code) && request.cookies.get(PREVIEW_COOKIE)?.value === code;
   // /ordine/<token> resta aperta a chi ha il link dell'ordine (email di conferma, anche da un altro telefono):
   // il token lungo e casuale basta a proteggerla, e senza backend la pagina non trova nulla
-  if (!SHOP_OPEN && !preview && SHOP_PATHS.test(pathname) && !ORDER_PATH.test(pathname)) return toHome();
+  // area utente (20/11/2026): a shop chiuso la vede chi ha il link degli amici o chi ha già fatto l'accesso
+  // (gli account si creano solo da lì); per tutti gli altri apre il 15/12 insieme allo shop
+  const hasAccount = Boolean(request.cookies.get("memo-account")?.value) && /^\/account(\/|$)/.test(pathname);
+  const emailLink = ORDER_PATH.test(pathname) || (ACCOUNT_LINK.test(pathname) && request.nextUrl.searchParams.has("token")) || hasAccount;
+  if (!SHOP_OPEN && !preview && SHOP_PATHS.test(pathname) && !emailLink) return toHome();
   if (!DOMAIN_HOSTS.has(host) || DOMAIN_MODE === "tutto") return NextResponse.next();
 
   if (DOMAIN_MODE === "costruzione") {

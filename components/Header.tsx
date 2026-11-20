@@ -93,6 +93,14 @@ export default function Header() {
           <a href="/#founder" className="btn btn--blue btn--sm header-cta" data-cursor="Iscriviti">
             Avvisami al lancio
           </a>
+          {/* area utente (20/11/2026): come il carrello, solo a shop aperto */}
+          {shopOpen && (
+            <a className="cart-btn account-btn" href="/account" aria-label="Il tuo account" data-cursor="Account">
+              <svg viewBox="0 0 24 24" aria-hidden>
+                <path fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8.5c.8-3.4 3.6-5.5 7-5.5s6.2 2.1 7 5.5" />
+              </svg>
+            </a>
+          )}
           {shopOpen && (
             <button className="cart-btn" onClick={() => setOpen(true)} aria-label={`Apri il carrello, ${count} articoli`} data-cursor="Carrello">
               <svg viewBox="0 0 24 24" aria-hidden>

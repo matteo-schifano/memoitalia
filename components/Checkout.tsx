@@ -6,6 +6,7 @@ import { useCart } from "./CartProvider";
 import { Arrow } from "./ui";
 import { PRIVACY_URL } from "@/lib/legal";
 import { trackBeginCheckout } from "@/lib/tracking";
+import type { CheckoutProfile } from "@/lib/account";
 
 type Rate = { id: number; name: string; priceCents: number; estimatedDays: string };
 type Discount = { code: string; discountCents: number; freeShipping: boolean };
@@ -18,18 +19,18 @@ const CARD = {
   note: "Carta, Apple Pay, Google Pay o Satispay, sulla pagina sicura di Stripe.",
 };
 
-// Paga alla consegna (contrassegno GLS, 20/11/2026): solo per chi ha il link degli amici.
-const COD = {
-  id: "contrassegno",
-  label: "Paga alla consegna",
-  note: "In contanti al corriere GLS quando ricevi il pacco.",
-};
-
 // PROVVISORIO (20/11/2026): solo per chi ha aperto il link di prova. L'ordine è «di prova» e si annulla da solo.
 const TEST = {
   id: "prova",
   label: "Pagamento di prova",
   note: "Solo per le prove: non paghi nulla, l'ordine è finto e si annulla da solo dopo 30 minuti.",
+};
+
+// Paga alla consegna (contrassegno GLS, 20/11/2026): solo per chi ha il link degli amici.
+const COD = {
+  id: "contrassegno",
+  label: "Paga alla consegna",
+  note: "In contanti al corriere GLS quando ricevi il pacco.",
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,6 +65,49 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
     const data = await res.json();
     return { ok: res.ok, data };
   }
+
+  // Area utente (20/11/2026): chi ha fatto l'accesso trova i dati dell'ultimo ordine già scritti. Facoltativo.
+  const [profile, setProfile] = useState<CheckoutProfile | null>(null);
+  const [accountChecked, setAccountChecked] = useState(false);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/account/me?cassa=1")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!live) return;
+        const p: CheckoutProfile | null = data?.checkout ?? null;
+        if (p) {
+          setProfile(p);
+          if (p.billing?.company) setCompany(true);
+          if (p.billing?.address) setSameAddress(false);
+        }
+        setAccountChecked(true);
+      })
+      .catch(() => live && setAccountChecked(true));
+    return () => {
+      live = false;
+    };
+  }, []);
+  const d = {
+    firstName: profile?.firstName ?? "",
+    lastName: profile?.lastName ?? "",
+    email: profile?.email ?? "",
+    phone: profile?.phone ?? "",
+    line1: profile?.address?.line1 ?? "",
+    line2: profile?.address?.line2 ?? "",
+    postcode: profile?.address?.postcode ?? "",
+    city: profile?.address?.city ?? "",
+    province: profile?.address?.province ?? "",
+    billName: profile?.billing?.name ?? "",
+    billVat: profile?.billing?.vatNumber ?? "",
+    billTax: profile?.billing?.taxCode ?? "",
+    billSdi: profile?.billing?.sdiCode ?? "",
+    billPec: profile?.billing?.pec ?? "",
+    billLine1: profile?.billing?.address?.line1 ?? "",
+    billPostcode: profile?.billing?.address?.postcode ?? "",
+    billCity: profile?.billing?.address?.city ?? "",
+    billProvince: profile?.billing?.address?.province ?? "",
+  };
 
   // Inizio del checkout per Meta e Google Analytics: una volta per apertura della cassa, col carrello pieno.
   const tracked = useRef(false);
@@ -258,27 +302,40 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
 
   return (
     <section className="container co-grid">
-      <form className="cf co-form" onSubmit={onSubmit} noValidate>
+      <form className="cf co-form" onSubmit={onSubmit} noValidate key={profile ? "account" : "ospite"}>
+        {accountChecked && (
+          <div className="co-account">
+            {profile ? (
+              <p>
+                Hai fatto l&apos;accesso come <strong>{profile.email}</strong>: abbiamo ripreso i dati del tuo ultimo ordine, controllali.
+              </p>
+            ) : (
+              <p>
+                Hai già un account? <a href="/account?next=/checkout">Accedi</a> e trovi i dati già scritti. Oppure continua senza: va benissimo lo stesso.
+              </p>
+            )}
+          </div>
+        )}
         <fieldset className="co-block">
           <legend>I tuoi dati</legend>
           <div className="cf-row">
             <label className="cf-field">
               <span>Nome</span>
-              <input name="firstName" autoComplete="given-name" required />
+              <input name="firstName" defaultValue={d.firstName} autoComplete="given-name" required />
             </label>
             <label className="cf-field">
               <span>Cognome</span>
-              <input name="lastName" autoComplete="family-name" required />
+              <input name="lastName" defaultValue={d.lastName} autoComplete="family-name" required />
             </label>
           </div>
           <div className="cf-row">
             <label className="cf-field">
               <span>Email</span>
-              <input name="email" type="email" autoComplete="email" required placeholder="nome@email.it" />
+              <input name="email" defaultValue={d.email} type="email" autoComplete="email" required placeholder="nome@email.it" />
             </label>
             <label className="cf-field">
               <span>Telefono</span>
-              <input name="phone" type="tel" autoComplete="tel" required placeholder="+39 333 000000" />
+              <input name="phone" defaultValue={d.phone} type="tel" autoComplete="tel" required placeholder="+39 333 000000" />
             </label>
           </div>
         </fieldset>
@@ -287,24 +344,24 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
           <legend>Dove spediamo</legend>
           <label className="cf-field">
             <span>Indirizzo</span>
-            <input name="line1" autoComplete="address-line1" required placeholder="Via e numero civico" />
+            <input name="line1" defaultValue={d.line1} autoComplete="address-line1" required placeholder="Via e numero civico" />
           </label>
           <label className="cf-field">
             <span>Scala, interno, c/o (facoltativo)</span>
-            <input name="line2" autoComplete="address-line2" />
+            <input name="line2" defaultValue={d.line2} autoComplete="address-line2" />
           </label>
           <div className="co-row-3">
             <label className="cf-field">
               <span>CAP</span>
-              <input name="postcode" inputMode="numeric" autoComplete="postal-code" maxLength={5} required />
+              <input name="postcode" defaultValue={d.postcode} inputMode="numeric" autoComplete="postal-code" maxLength={5} required />
             </label>
             <label className="cf-field">
               <span>Città</span>
-              <input name="city" autoComplete="address-level2" required />
+              <input name="city" defaultValue={d.city} autoComplete="address-level2" required />
             </label>
             <label className="cf-field">
               <span>Provincia</span>
-              <input name="province" autoComplete="address-level1" maxLength={2} required placeholder="RE" />
+              <input name="province" defaultValue={d.province} autoComplete="address-level1" maxLength={2} required placeholder="RE" />
             </label>
           </div>
           <label className="cf-field">
@@ -334,33 +391,33 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
             <>
               <label className="cf-field">
                 <span>Ragione sociale</span>
-                <input name="billName" autoComplete="organization" required />
+                <input name="billName" defaultValue={d.billName} autoComplete="organization" required />
               </label>
               <div className="cf-row">
                 <label className="cf-field">
                   <span>Partita IVA</span>
-                  <input name="billVat" inputMode="numeric" maxLength={13} required />
+                  <input name="billVat" defaultValue={d.billVat} inputMode="numeric" maxLength={13} required />
                 </label>
                 <label className="cf-field">
                   <span>Codice fiscale (se diverso)</span>
-                  <input name="billTax" maxLength={16} />
+                  <input name="billTax" defaultValue={d.billTax} maxLength={16} />
                 </label>
               </div>
               <div className="cf-row">
                 <label className="cf-field">
                   <span>Codice SDI (facoltativo)</span>
-                  <input name="billSdi" maxLength={7} />
+                  <input name="billSdi" defaultValue={d.billSdi} maxLength={7} />
                 </label>
                 <label className="cf-field">
                   <span>PEC (facoltativa)</span>
-                  <input name="billPec" type="email" />
+                  <input name="billPec" defaultValue={d.billPec} type="email" />
                 </label>
               </div>
             </>
           ) : (
             <label className="cf-field">
               <span>Codice fiscale (facoltativo)</span>
-              <input name="billTax" maxLength={16} autoCapitalize="characters" placeholder="Inseriscilo se vuoi la fattura" />
+              <input name="billTax" defaultValue={d.billTax} maxLength={16} autoCapitalize="characters" placeholder="Inseriscilo se vuoi la fattura" />
             </label>
           )}
           <label className="cf-check">
@@ -371,20 +428,20 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
             <>
               <label className="cf-field">
                 <span>Indirizzo di fatturazione</span>
-                <input name="billLine1" autoComplete="billing address-line1" required placeholder="Via e numero civico" />
+                <input name="billLine1" defaultValue={d.billLine1} autoComplete="billing address-line1" required placeholder="Via e numero civico" />
               </label>
               <div className="co-row-3">
                 <label className="cf-field">
                   <span>CAP</span>
-                  <input name="billPostcode" inputMode="numeric" autoComplete="billing postal-code" maxLength={5} required />
+                  <input name="billPostcode" defaultValue={d.billPostcode} inputMode="numeric" autoComplete="billing postal-code" maxLength={5} required />
                 </label>
                 <label className="cf-field">
                   <span>Città</span>
-                  <input name="billCity" autoComplete="billing address-level2" required />
+                  <input name="billCity" defaultValue={d.billCity} autoComplete="billing address-level2" required />
                 </label>
                 <label className="cf-field">
                   <span>Provincia</span>
-                  <input name="billProvince" autoComplete="billing address-level1" maxLength={2} required placeholder="RE" />
+                  <input name="billProvince" defaultValue={d.billProvince} autoComplete="billing address-level1" maxLength={2} required placeholder="RE" />
                 </label>
               </div>
             </>

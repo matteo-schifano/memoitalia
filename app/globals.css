@@ -5477,5 +5477,127 @@ p {
   .co-row-3 .cf-field:nth-child(2) { grid-column: 1 / -1; grid-row: 1; }
 }
 
+/* ==========================================================================
+   Area utente (20/11/2026): accesso, registrazione, ordini
+   ========================================================================== */
+.ac-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 36px); align-items: start; padding-block: clamp(36px, 6vw, 72px); }
+.ac-narrow { max-width: 640px; padding-block: clamp(36px, 6vw, 72px); }
+.ac-card h2 { margin: 0 0 18px; font-family: var(--font-display); font-weight: 400; font-size: 28px; line-height: 1; text-transform: uppercase; color: var(--blue); }
+.ac-card p { margin: 0 0 14px; }
+.ac-card--soft { background: var(--sky-soft); color: var(--blue); }
+.ac-card--soft .btn { margin-top: 6px; }
+.ac-pass { position: relative; display: block; }
+.ac-pass input { width: 100%; padding-right: 92px; }
+.ac-pass-toggle { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); border: 0; background: none; padding: 6px 8px; font: inherit; font-size: 13px; font-weight: 700; color: var(--blue); cursor: pointer; }
+.ac-hint { font-size: 13px; opacity: .7; }
+.ac-link, .ac-alt a { color: var(--blue); font-weight: 700; }
+.ac-link { justify-self: start; font-size: 14px; }
+.ac-alt { margin: 18px 0 0 !important; font-size: 15px; }
+.ac-wait { margin: 0; font-weight: 700; color: var(--blue); }
+.ac-msg { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.ac-msg p, .cf-done:has(.btn) p { margin: 0 0 14px; }
+.ac-msg--warn { padding: 22px; border-radius: 20px; background: #fbe7cf; color: var(--ink); }
+.ac-area { padding-block: clamp(36px, 6vw, 72px); }
+.ac-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.ac-head p { margin: 0; overflow-wrap: anywhere; }
+.ac-logout { border: 2px solid currentColor; border-radius: 999px; background: none; padding: 8px 18px; font: inherit; font-weight: 700; color: var(--blue); cursor: pointer; }
+.ac-orders { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.ac-order { display: flex; flex-direction: column; gap: 12px; }
+.ac-order-top, .ac-order-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.ac-order-top strong { display: block; font-size: 18px; }
+.ac-order-top small { font-size: 14px; opacity: .7; }
+.ac-order-bottom > strong { font-size: 20px; }
+.ac-items { margin: 0; }
+.ac-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ac-tag { display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.ac-tag--ok { background: #dff3e4; color: #1d6b38; }
+.ac-tag--info { background: var(--sky-soft); color: var(--blue); }
+.ac-tag--muted { background: #ece7df; color: #5b6275; }
+.ac-empty { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding-block: 36px; }
+.ac-empty p { margin: 0; }
+.ac-offer { margin: 6px 0 18px; padding: 20px; border-radius: 20px; background: var(--sky-soft); color: var(--blue); }
+.ac-offer > strong { display: block; font-family: var(--font-display); font-weight: 400; font-size: 22px; line-height: 1.1; text-transform: uppercase; }
+.ac-offer p { margin: 8px 0 14px; color: var(--ink); }
+.ac-offer .cf { gap: 12px; }
+.ac-offer .ac-hint a { color: inherit; }
+/* Area utente: traguardi sportivi (20/11/2026) */
+.ac-section-title { margin: 36px 0 14px; font-family: var(--font-display); font-weight: 400; font-size: 28px; line-height: 1; text-transform: uppercase; color: var(--blue); }
+.ac-badges { margin-bottom: 8px; padding: clamp(20px, 3vw, 28px); border-radius: var(--radius); background: var(--blue); color: var(--white); }
+.ac-badges-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.ac-badges-head h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 28px; line-height: 1; text-transform: uppercase; }
+.ac-badges-head span { font-weight: 700; color: var(--sand); }
+.ac-badges ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.ac-badges li { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 14px 8px; border-radius: 18px; background: rgba(255, 255, 255, 0.08); opacity: 0.7; }
+.ac-badges li.is-earned { background: rgba(255, 255, 255, 0.14); opacity: 1; }
+.ac-badge-medal { display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: 6px; border-radius: 50%; border: 3px dashed rgba(255, 255, 255, 0.45); color: rgba(255, 255, 255, 0.6); }
+.ac-badge-medal svg { width: 32px; height: 32px; }
+.is-earned .ac-badge-medal { border: 3px solid var(--white); background: var(--sand); color: var(--blue); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); }
+.ac-badges strong { font-size: 15px; }
+.ac-badges small { font-size: 12px; line-height: 1.3; opacity: 0.85; }
+.ac-badges em { margin-top: 2px; font-style: normal; font-size: 12px; font-weight: 700; color: var(--sand); }
+@media (max-width: 720px) {
+  .ac-badges ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 400px) {
+  .ac-badges ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* Area utente: riquadro promo e livello in squadra, nello stile dei programmi fedeltà (20/11/2026) */
+.ac-promo { margin-bottom: 18px; padding: clamp(22px, 3vw, 30px); border-radius: var(--radius); background: var(--sand); color: var(--blue); }
+.ac-promo h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 4vw, 34px); line-height: 1; text-transform: uppercase; }
+.ac-promo p { margin: 8px 0 18px; font-size: 16px; }
+.ac-btn-white { background: var(--white); color: var(--blue); }
+.ac-btn-white:hover { background: var(--cream); }
+.ac-promo .ac-missing { margin-top: 8px; opacity: 0.9; }
+.ac-level { margin-bottom: 8px; border-radius: var(--radius); background: var(--white); overflow: hidden; }
+.ac-level-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px clamp(20px, 3vw, 30px); border-bottom: 1px solid rgba(17, 26, 51, 0.08); }
+.ac-level-head h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(24px, 3.5vw, 30px); line-height: 1; text-transform: uppercase; color: var(--blue); }
+.ac-level-head img { width: 56px; height: auto; }
+.ac-level-body { padding: 20px clamp(20px, 3vw, 30px) 24px; }
+.ac-level-body small { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #5b6275; }
+.ac-level-name { display: block; margin: 4px 0 18px; font-family: var(--font-display); font-weight: 400; font-size: 34px; line-height: 1; text-transform: uppercase; color: var(--blue); }
+.ac-level-bar { position: relative; height: 12px; margin: 0 12px; border-radius: 999px; background: var(--sky-soft); }
+.ac-level-fill { position: absolute; inset: 0 auto 0 0; width: var(--pos); border-radius: 999px; background: var(--blue); }
+.ac-level-knob { position: absolute; top: 50%; left: var(--pos); width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; border: 3px solid var(--blue); background: var(--white); }
+.ac-level-ticks { position: relative; list-style: none; height: 34px; margin: 6px 12px 10px; padding: 0; }
+.ac-level-ticks li { position: absolute; top: 0; padding-top: 12px; transform: translateX(-50%); font-size: 15px; color: var(--ink); }
+.ac-level-ticks li::before { content: ""; position: absolute; top: 0; left: 50%; width: 1px; height: 9px; background: #c9cfdd; }
+.ac-level-numbers { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.ac-level-numbers div:last-child { text-align: right; }
+.ac-level-numbers div:first-child small { white-space: nowrap; }
+.ac-level-numbers b { display: block; margin-top: 4px; font-family: var(--font-display); font-weight: 400; font-size: 40px; line-height: 1; color: var(--blue); }
+.ac-level-note { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid rgba(17, 26, 51, 0.08); font-size: 14px; color: #5b6275; }
+/* Area utente: il pacco «in campo», l'elefantino cammina fino alla tappa raggiunta */
+.ac-field { padding-top: 46px; }
+.ac-field-pitch { position: relative; height: 18px; margin: 0 12px; border-radius: 999px; background: repeating-linear-gradient(90deg, #4a9a5a 0 22px, #55a866 22px 44px); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.6); }
+.ac-field-done { position: absolute; inset: 0 auto 0 0; width: var(--pos); border-radius: 999px; background: rgba(234, 166, 95, 0.55); }
+.ac-field-stop { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--white); box-shadow: 0 0 0 3px #4a9a5a; }
+.ac-field-stop.is-done { background: var(--sand); box-shadow: 0 0 0 3px var(--white); }
+.ac-field-mascot { position: absolute; bottom: 8px; left: var(--pos); width: 52px; height: auto; transform: translateX(-50%); }
+@media (prefers-reduced-motion: no-preference) {
+  .ac-field-mascot { animation: ac-walk 0.9s ease-in-out infinite alternate; }
+}
+@keyframes ac-walk { from { transform: translateX(-50%) translateY(0) rotate(-3deg); } to { transform: translateX(-50%) translateY(-4px) rotate(3deg); } }
+.ac-field-labels { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 10px 0 0; padding: 0; font-size: 13px; color: #8e97ab; }
+.ac-field-labels li { text-align: center; }
+.ac-field-labels li:first-child { text-align: left; }
+.ac-field-labels li:last-child { text-align: right; }
+.ac-field-labels .is-done { color: var(--ink); }
+.ac-field-labels .is-current { color: var(--blue); font-weight: 800; }
+.ac-missing { display: block; width: 100%; font-size: 13px; opacity: 0.75; }
+@media (max-width: 480px) {
+  .ac-field-labels { font-size: 11.5px; }
+}
+.co-account { padding: 14px 18px; border-radius: 16px; background: var(--sky-soft); color: var(--blue); }
+.co-account p { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+.co-account a { color: inherit; font-weight: 700; }
+@media (max-width: 900px) {
+  .ac-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .ac-order-bottom { flex-direction: column; align-items: stretch; }
+  .ac-actions { flex-direction: column; }
+  .ac-actions .btn { width: 100%; justify-content: center; }
+}
+
 /* Tabella dell'integratore: quantità e, sotto, % NRV */
 .pi-table--dose small { display: block; font-size: .85em; font-weight: 400; opacity: .75; white-space: nowrap; }

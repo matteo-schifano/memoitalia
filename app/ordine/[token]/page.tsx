@@ -9,6 +9,8 @@ import { getOrder } from "@/lib/backend";
 import { formatPrice } from "@/lib/catalog";
 import ClearCart from "@/components/ClearCart";
 import TrackPurchase from "@/components/TrackPurchase";
+import { OrderAccountOffer } from "@/components/AccountForms";
+import { accountKey } from "@/lib/account";
 import { Arrow } from "@/components/ui";
 
 // Pagina raggiungibile solo con il link segreto dell'ordine: mai nei motori di ricerca.
@@ -31,6 +33,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
   const order = await getOrder(token);
   if (!order) notFound();
 
+  const loggedIn = Boolean(await accountKey());
   // ordine appena concluso: pagato online, oppure da pagare alla consegna (contrassegno, 20/11/2026).
   // Solo allora si svuota il carrello e parte l'evento Acquisto (una volta per ordine).
   const confirmed = pagamento === "ok" && (order.paymentStatus === "paid" || (order.paymentMethod === "contrassegno" && order.status !== "cancelled"));
@@ -149,6 +152,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
                 <p>Appena parte ricevi un&apos;email con il link per seguirlo.</p>
               </div>
             )}
+            {!awaiting && !cancelled && !order.hasAccount && !loggedIn && <OrderAccountOffer token={token} />}
             <p className="co-help">
               Dubbi sull&apos;ordine? Scrivici a <a href="mailto:info@memoitalia.it">info@memoitalia.it</a> indicando il numero {order.number}.
             </p>

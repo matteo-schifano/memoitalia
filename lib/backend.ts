@@ -83,6 +83,8 @@ export type OrderView = {
   items: { name: string; qty: number; totalCents: number }[];
   shipments: { status: string; carrier: string; tracking: string; trackingUrl: string }[];
   bank: { iban: string; beneficiary: string } | null;
+  /** c'è già un account confermato con l'email dell'ordine (area utente, 20/11/2026) */
+  hasAccount?: boolean;
 };
 
 export async function getOrder(token: string): Promise<OrderView | null> {

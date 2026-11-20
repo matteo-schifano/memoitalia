@@ -38,7 +38,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <Cursor />
         <Header />
         <main className="page">
-          <PageHero lines={["Bentornato", "in squadra."]} lead="Accedi per vedere i tuoi ordini e trovare i dati già pronti in cassa." />
+          <PageHero lines={["La tua", "area Mèmo."]} lead="Accedi per vedere i tuoi ordini e trovare i dati già pronti in cassa." />
           <section className="container ac-grid">
             <div className="co-card ac-card">
               <h2>Accedi</h2>

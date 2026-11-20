@@ -8,6 +8,7 @@ import Cursor from "@/components/Cursor";
 import { getOrder } from "@/lib/backend";
 import { formatPrice } from "@/lib/catalog";
 import ClearCart from "@/components/ClearCart";
+import TrackPurchase from "@/components/TrackPurchase";
 import { Arrow } from "@/components/ui";
 
 // Pagina raggiungibile solo con il link segreto dell'ordine: mai nei motori di ricerca.
@@ -44,7 +45,14 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
       <Cursor />
       <Header />
       <main className="page">
-        {pagamento === "ok" && order.paymentStatus === "paid" && <ClearCart />}
+        {pagamento === "ok" && order.paymentStatus === "paid" && (
+          <>
+            <ClearCart />
+            <TrackPurchase
+              order={{ number: order.number, totalCents: order.totalCents, shippingCents: order.shippingCents, taxCents: order.taxCents, items: order.items }}
+            />
+          </>
+        )}
         <PageHero lines={hero.lines} lead={hero.lead} />
         <section className="container co-done">
           <div className="co-card">

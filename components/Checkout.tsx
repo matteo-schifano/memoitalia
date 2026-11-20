@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatPrice } from "@/lib/catalog";
 import { useCart } from "./CartProvider";
 import { Arrow } from "./ui";
 import { PRIVACY_URL } from "@/lib/legal";
+import { trackBeginCheckout } from "@/lib/tracking";
 
 type Rate = { id: number; name: string; priceCents: number; estimatedDays: string };
 type Discount = { code: string; discountCents: number; freeShipping: boolean };
@@ -49,6 +50,18 @@ export default function Checkout() {
     const data = await res.json();
     return { ok: res.ok, data };
   }
+
+  // Inizio del checkout per Meta e Google Analytics: una volta per apertura della cassa, col carrello pieno.
+  const tracked = useRef(false);
+  useEffect(() => {
+    if (tracked.current || !ready || !lines.length) return;
+    tracked.current = true;
+    const items = lines.map((l) => {
+      const p = products.find((x) => x.id === l.id);
+      return { id: l.id, name: p?.name ?? l.id, priceCents: p?.priceCents ?? 0, qty: l.qty };
+    });
+    trackBeginCheckout(items, subtotal);
+  }, [ready, lines, products, subtotal]);
 
   // Se il carrello cambia (dal pannello laterale) il codice va ricalcolato sul nuovo importo.
   useEffect(() => {

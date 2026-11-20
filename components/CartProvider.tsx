@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Product, ProductId } from "@/lib/catalog";
+import { trackAddToCart } from "@/lib/tracking";
 
 type Line = { id: ProductId; qty: number };
 
@@ -56,7 +57,9 @@ export function CartProvider({ children, products, checkoutEnabled }: { children
       return [...prev, { id, qty }];
     });
     setBump((b) => b + 1);
-  }, []);
+    const p = products.find((x) => x.id === id);
+    if (p) trackAddToCart({ id, name: p.name, priceCents: p.priceCents, qty });
+  }, [products]);
 
   const setQty = useCallback((id: ProductId, qty: number) => {
     setLines((prev) => (qty <= 0 ? prev.filter((l) => l.id !== id) : prev.map((l) => (l.id === id ? { ...l, qty } : l))));

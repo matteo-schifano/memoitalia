@@ -222,7 +222,7 @@ export function LogoutButton() {
   return (
     <button
       type="button"
-      className="ac-logout"
+      className="btn btn--blue btn--sm"
       disabled={sending}
       onClick={async () => {
         setSending(true);

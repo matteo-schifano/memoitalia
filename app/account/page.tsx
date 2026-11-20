@@ -68,12 +68,6 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
       <main className="page">
         <PageHero lines={[`Ciao ${account.firstName || ""}`.trim(), "i tuoi ordini."]} lead="Qui trovi tutti gli ordini fatti con la tua email, anche quelli di prima della registrazione." />
         <section className="container ac-area">
-          <div className="ac-head">
-            <p>
-              Hai fatto l&apos;accesso come <strong>{account.email}</strong>
-            </p>
-            <LogoutButton />
-          </div>
           {stats && <LevelCard stats={stats} />}
           <h2 className="ac-section-title">I tuoi ordini</h2>
           {orders.length === 0 ? (
@@ -115,6 +109,12 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               ))}
             </ul>
           )}
+          <div className="ac-head ac-head--bottom">
+            <p>
+              Hai fatto l&apos;accesso come <strong>{account.email}</strong>
+            </p>
+            <LogoutButton />
+          </div>
         </section>
       </main>
       <Footer />

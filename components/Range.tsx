@@ -181,7 +181,7 @@ export default function Range() {
           {/* prezzo nascosto finché lo shop è chiuso (richiesta del 13/11/2026): torna da solo con SHOP_OPEN */}
           {SHOP_OPEN && (
             <p className="rg-price">
-              Prezzo <strong>19,90 €</strong>
+              Prezzo <strong>21,90 €</strong>
             </p>
           )}
           {SHOP_OPEN && (

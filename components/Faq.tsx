@@ -63,9 +63,12 @@ const GROUPS: Group[] = [
       { q: "Dove spedite?", a: "In tutta Italia." },
       {
         q: "Posso comprare una barretta singola?",
-        a: "Online no: le barrette si acquistano in box da 12. Puoi scegliere la box di un solo gusto oppure la box Experience, con 3 barrette per ognuno dei 4 gusti. Ogni box costa 32,40 €, cioè 2,70 € a barretta.",
+        a: "Online no: le barrette si acquistano in box da 12. Puoi scegliere la box di un solo gusto oppure la box Experience, con 3 barrette per ognuno dei 4 gusti. Ogni box costa 34,80 €, cioè 2,90 € a barretta.",
       },
-      { q: "Quanto costa la spedizione e quanto ci mette?", a: <Pending /> },
+      {
+        q: "Quanto costa la spedizione e quanto ci mette?",
+        a: "La spedizione costa 6,90 € ed è gratuita per gli ordini da 40 € in su (calcolati dopo l'eventuale sconto). Spediamo con GLS in tutta Italia: di solito il pacco arriva in 24 ore dalla partenza, in 48 ore in Calabria, Sicilia e Sardegna. Quando parte ti mandiamo un'email con il link per seguirlo.",
+      },
       { q: "Come posso pagare?", a: <Pending /> },
       { q: "Posso restituire un prodotto?", a: <>Diritto di recesso e modalità di reso: <Pending /></> },
     ],

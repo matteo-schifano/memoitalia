@@ -43,9 +43,10 @@ export type Product = {
   };
 };
 
-// Le barrette non si vendono singole: ogni gusto è in box da 12, al prezzo di 2,70 € a barretta (32,40 € la box).
+// Le barrette non si vendono singole: ogni gusto è in box da 12, al prezzo di 2,90 € a barretta (34,80 € la box).
+// Listino del 20/11/2026 (prima 2,70 € e 32,40 €). I prezzi veri arrivano dal pannello: questi valgono se il backend non risponde.
 export const PACK_SIZE = 12;
-const BOX_CENTS = 3240;
+const BOX_CENTS = 3480;
 
 export const products: Product[] = [
   {
@@ -118,7 +119,7 @@ export const products: Product[] = [
     ingredients: "60 compresse",
     description:
       "Tre vitamine con funzioni complementari in un'unica compressa masticabile al gusto frutti rossi, pensata apposta anche per i più piccoli*, dai 3 anni in su. Per integrare l'alimentazione di tutti i giorni.",
-    priceCents: 1990,
+    priceCents: 2190, // 21,90 € dal 20/11/2026 (prima 19,90 €)
     image: "/img/products/integratore.webp",
     theme: { bg: "#0b4ea2", ink: "#ffffff", accent: "#eaa65f" },
   },

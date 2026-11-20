@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import Cursor from "@/components/Cursor";
 import { LoginForm, LogoutButton } from "@/components/AccountForms";
-import { LevelCard, OrderField, PromoCard, Reorder } from "@/components/AccountExtras";
+import { LevelCard, OrderField, Reorder } from "@/components/AccountExtras";
 import { Arrow } from "@/components/ui";
 import { backendEnabled } from "@/lib/backend";
 import { getAccountArea, safeNext } from "@/lib/account";
@@ -74,7 +74,6 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             </p>
             <LogoutButton />
           </div>
-          <PromoCard lastItems={orders[0]?.items ?? null} />
           {stats && <LevelCard stats={stats} />}
           <h2 className="ac-section-title">I tuoi ordini</h2>
           {orders.length === 0 ? (

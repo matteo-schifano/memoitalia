@@ -291,7 +291,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
   if (lines.length === 0) {
     return (
       <section className="container co-empty">
-        <img src="/img/brand/mascot.webp" alt="" width={160} height={172} />
+        <img src="/img/brand/elefante-fame.webp" alt="" width={160} height={170} />
         <p>Il carrello è vuoto. Mèmo ha un po&apos; fame…</p>
         <a href="/shop" className="btn btn--blue">
           Vai allo shop

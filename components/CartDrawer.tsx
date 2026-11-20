@@ -28,7 +28,7 @@ export default function CartDrawer() {
 
         {lines.length === 0 ? (
           <div className="drawer-empty">
-            <img src="/img/brand/mascot.webp" alt="" width={160} height={172} />
+            <img src="/img/brand/elefante-fame.webp" alt="" width={160} height={170} />
             <p>Il carrello è vuoto. Mèmo ha un po' fame…</p>
             <a href="/shop" className="btn btn--blue" onClick={() => setOpen(false)}>
               Vai allo shop

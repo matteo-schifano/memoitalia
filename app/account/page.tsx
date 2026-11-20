@@ -79,7 +79,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <h2 className="ac-section-title">I tuoi ordini</h2>
           {orders.length === 0 ? (
             <div className="co-card ac-empty">
-              <img src="/img/brand/mascot.webp" alt="" width={140} height={150} />
+              <img src="/img/brand/elefante-fame.webp" alt="" width={140} height={149} />
               <p>Non hai ancora ordini. Mèmo ha un po&apos; fame…</p>
               <a href="/shop" className="btn btn--blue">
                 Vai allo shop <Arrow className="btn-arrow" />

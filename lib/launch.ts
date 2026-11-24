@@ -1,6 +1,6 @@
 // Data di apertura dello shop: il conto alla rovescia della home punta qui.
-// Data ufficiale di lancio (confermata il 12/11/2026).
-export const LAUNCH_DATE = "2026-12-15T10:00:00+01:00";
+// Data ufficiale di lancio: 10 dicembre 2026 (anticipata dal 15 il 24/11/2026).
+export const LAUNCH_DATE = "2026-12-10T10:00:00+01:00";
 
 export const launchDateLabel = new Intl.DateTimeFormat("it-IT", {
   day: "numeric",

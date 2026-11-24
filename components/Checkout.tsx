@@ -56,11 +56,16 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
   const shipping = discount?.freeShipping ? 0 : (rate?.priceCents ?? 0);
   const total = net + shipping;
 
+  // Con il codice vanno anche i prodotti del carrello (24/11/2026): alcuni codici valgono solo
+  // con certi prodotti (es. LANCIO20: almeno 2 box e 1 integratore).
+  const cartItems = lines.map((l) => ({ id: l.id, qty: l.qty }));
+  const cartKey = lines.map((l) => `${l.id}:${l.qty}`).join(",");
+
   async function checkCode(code: string, cents: number) {
     const res = await fetch("/api/discount", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, subtotalCents: cents }),
+      body: JSON.stringify({ code, subtotalCents: cents, items: cartItems }),
     });
     const data = await res.json();
     return { ok: res.ok, data };
@@ -121,7 +126,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
     trackBeginCheckout(items, subtotal);
   }, [ready, lines, products, subtotal]);
 
-  // Se il carrello cambia (dal pannello laterale) il codice va ricalcolato sul nuovo importo.
+  // Se il carrello cambia (dal pannello laterale) il codice va ricalcolato sul nuovo importo e sui nuovi prodotti.
   useEffect(() => {
     if (!discount || !subtotal) return;
     let live = true;
@@ -129,7 +134,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
       .then(({ ok, data }) => {
         if (!live) return;
         if (ok) {
-          if (data.discountCents !== discount.discountCents) setDiscount(data);
+          if (data.discountCents !== discount.discountCents || data.freeShipping !== discount.freeShipping) setDiscount(data);
         } else {
           setDiscount(null);
           setCodeError(data.error ?? "Il codice non è più valido.");
@@ -139,7 +144,8 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
     return () => {
       live = false;
     };
-  }, [subtotal, discount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal, cartKey, discount]);
 
   // Il costo di spedizione può dipendere dalla spesa (soglia di gratuità).
   useEffect(() => {

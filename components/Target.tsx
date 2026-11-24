@@ -14,7 +14,7 @@ const SHOTS = [
   { img: "auto-gianduia", tag: "Ogni giorno", title: "In viaggio", text: "Il buono che ti porti dietro." },
   { img: "padel-cocco", tag: "Sport", title: "A padel", text: "Il cambio campo più buono." },
   { img: "ufficio-gianduia", tag: "Ogni giorno", title: "In ufficio", text: "Tra una riunione e l'altra." },
-  { img: "calcio-gianduia", tag: "Sport", title: "Dopo l'allenamento", text: "Il premio dopo la fatica." },
+  { img: "calcio-gianduia", tag: "Sport", title: "Dopo l'allenamento", text: "La tua ricarica di nutrienti." },
   { img: "papa-figlio-integratore", tag: "Ogni età", title: "Grandi e piccoli", text: "Le vitamine Mèmo, per tutta la famiglia." },
   { img: "sport-borsa-gianduia", tag: "Sport", title: "In borsa", text: "Accanto alla borraccia, sempre." },
   { img: "amici-gianduia", tag: "Ogni età", title: "Con gli amici", text: "Ovunque si vada." },

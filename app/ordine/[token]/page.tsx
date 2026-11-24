@@ -44,7 +44,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
     ? { lines: ["Ordine", "annullato."], lead: `L'ordine ${order.number} è stato annullato. Se avevi pagato con carta, il rimborso torna sullo stesso metodo di pagamento.` }
     : awaiting
       ? { lines: ["Manca solo", "il pagamento."], lead: `L'ordine ${order.number} non è ancora pagato: nessun addebito finché non completi il pagamento con carta.` }
-      : { lines: ["Ordine", "ricevuto!"], lead: `Grazie! Il tuo ordine ${order.number} è confermato: trovi il riepilogo nella tua email. Ti scriviamo appena parte.` };
+      : { lines: ["Ordine", "ricevuto!"], lead: `Grazie! Il tuo ordine ${order.number} è confermato: trovi il riepilogo nella tua email. ${order.pickup ? "Ti scriviamo quando è pronto da ritirare." : "Ti scriviamo appena parte."}` };
 
   return (
     <>
@@ -85,8 +85,8 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
                 </div>
               )}
               <div>
-                <dt>Spedizione</dt>
-                <dd>{formatPrice(order.shippingCents)}</dd>
+                <dt>{order.pickup ? "Ritiro in negozio" : "Spedizione"}</dt>
+                <dd>{order.shippingCents ? formatPrice(order.shippingCents) : "Gratis"}</dd>
               </div>
               <div className="co-sum-total">
                 <dt>Totale</dt>
@@ -130,7 +130,22 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
                 <p>Tieni pronti {formatPrice(order.totalCents)} in contanti per il corriere GLS.</p>
               </div>
             )}
-            {awaiting || cancelled ? null : order.shipments.length > 0 ? (
+            {/* ritiro in negozio (24/11/2026): dove e quando passare, al posto del corriere */}
+            {awaiting || cancelled ? null : order.pickup ? (
+              <div className="co-step">
+                <strong>{order.shipments.some((s) => s.status === "delivered") ? "Ritirato" : order.shipments.length > 0 ? "Pronto per il ritiro" : "Lo stiamo preparando"}</strong>
+                <p>
+                  {order.pickup.place}, {order.pickup.address}
+                  {order.pickup.hours && (
+                    <>
+                      <br />
+                      {order.pickup.hours}
+                    </>
+                  )}
+                </p>
+                {order.shipments.length === 0 && <p>Ti scriviamo quando è pronto da ritirare.</p>}
+              </div>
+            ) : order.shipments.length > 0 ? (
               order.shipments.map((s, i) => (
                 <div className="co-step" key={i}>
                   <strong>{SHIPMENT_LABELS[s.status] ?? "Spedizione"}</strong>

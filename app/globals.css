@@ -5457,6 +5457,11 @@ p {
 .co-option input { flex: none; width: 18px; height: 18px; accent-color: var(--blue); }
 .co-option span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .co-option small { font-size: 13px; opacity: .7; }
+/* ritiro in negozio (24/11/2026): negozio, indirizzo e orari sotto la scelta */
+.co-pickup { display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border-radius: 16px; background: var(--cream); font-size: 15px; line-height: 1.45; }
+.co-pickup strong { color: var(--blue); }
+.co-pickup small { margin-top: 6px; font-size: 13px; opacity: .75; }
+.co-hint { margin: 0; font-size: 13px; opacity: .75; }
 /* Privato / Azienda: due scelte affiancate anche su telefono */
 .cf-row.co-kind { grid-template-columns: 1fr 1fr; gap: 10px; }
 .co-kind .co-option { padding: 12px 14px; }

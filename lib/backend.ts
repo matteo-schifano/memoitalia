@@ -82,6 +82,8 @@ export type OrderView = {
   totalCents: number;
   items: { name: string; qty: number; totalCents: number }[];
   shipments: { status: string; carrier: string; tracking: string; trackingUrl: string }[];
+  /** ritiro in negozio (24/11/2026): negozio, indirizzo e orari */
+  pickup?: { place: string; address: string; hours: string } | null;
   bank: { iban: string; beneficiary: string } | null;
   /** c'è già un account confermato con l'email dell'ordine (area utente, 20/11/2026) */
   hasAccount?: boolean;

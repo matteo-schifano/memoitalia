@@ -8,7 +8,9 @@ import { PRIVACY_URL } from "@/lib/legal";
 import { trackBeginCheckout } from "@/lib/tracking";
 import type { CheckoutProfile } from "@/lib/account";
 
-type Rate = { id: number; name: string; priceCents: number; estimatedDays: string };
+// Ritiro in negozio (24/11/2026): una tariffa può essere un negozio dove passare a prendere il pacco
+type Pickup = { place: string; line1: string; postcode: string; city: string; province: string; address: string; hours: string };
+type Rate = { id: number; name: string; priceCents: number; estimatedDays: string; pickup?: Pickup | null };
 type Discount = { code: string; discountCents: number; freeShipping: boolean };
 
 // Unico metodo in cassa: Stripe (carta, Apple Pay, Google Pay, Satispay… scelti dalla dashboard di Stripe).
@@ -44,6 +46,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
   const payments = [...(cardEnabled ? [CARD] : []), ...(codPayment ? [COD] : []), ...(testPayment ? [TEST] : [])];
   const [company, setCompany] = useState(false);
   const [sameAddress, setSameAddress] = useState(true);
+  const [hasTax, setHasTax] = useState(false); // codice fiscale scritto: per i privati vuol dire fattura
   const [codeInput, setCodeInput] = useState("");
   const [discount, setDiscount] = useState<Discount | null>(null);
   const [codeError, setCodeError] = useState("");
@@ -53,6 +56,9 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
   const discountCents = discount?.discountCents ?? 0;
   const net = subtotal - discountCents;
   const rate = rates?.find((r) => r.id === rateId) ?? null;
+  const pickup = rate?.pickup ?? null;
+  // Con il ritiro non c'è un indirizzo di spedizione da copiare: l'indirizzo di fatturazione serve solo per la fattura
+  const billAddress = pickup ? company || hasTax : !sameAddress;
   const shipping = discount?.freeShipping ? 0 : (rate?.priceCents ?? 0);
   const total = net + shipping;
 
@@ -84,6 +90,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
         if (p) {
           setProfile(p);
           if (p.billing?.company) setCompany(true);
+          if (p.billing?.taxCode) setHasTax(true);
           if (p.billing?.address) setSameAddress(false);
         }
         setAccountChecked(true);
@@ -191,11 +198,13 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
     const v = (k: string) => String(fd.get(k) ?? "").trim();
     if (!v("firstName") || !v("lastName")) return "Scrivi nome e cognome.";
     if (!EMAIL_RE.test(v("email"))) return "Controlla l'email.";
-    if (v("phone").replace(/\D/g, "").length < 8) return "Serve un telefono: lo usa il corriere per la consegna.";
-    if (!v("line1")) return "Scrivi l'indirizzo.";
-    if (!/^\d{5}$/.test(v("postcode"))) return "Il CAP deve avere 5 cifre.";
-    if (!v("city")) return "Scrivi la città.";
-    if (!/^[A-Za-z]{2}$/.test(v("province"))) return "La provincia va scritta con due lettere, es. RE.";
+    if (v("phone").replace(/\D/g, "").length < 8) return pickup ? "Serve un telefono, per avvisarti se c'è un problema col ritiro." : "Serve un telefono: lo usa il corriere per la consegna.";
+    if (!pickup) {
+      if (!v("line1")) return "Scrivi l'indirizzo.";
+      if (!/^\d{5}$/.test(v("postcode"))) return "Il CAP deve avere 5 cifre.";
+      if (!v("city")) return "Scrivi la città.";
+      if (!/^[A-Za-z]{2}$/.test(v("province"))) return "La provincia va scritta con due lettere, es. RE.";
+    }
     // Fattura sempre per le aziende; per i privati solo se inseriscono il codice fiscale (16/11/2026)
     const tax = v("billTax").replace(/\s/g, "");
     if (company) {
@@ -206,7 +215,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
     } else if (tax && !/^[A-Z0-9]{16}$/i.test(tax)) {
       return "Il codice fiscale deve avere 16 caratteri (oppure lascialo vuoto se non ti serve la fattura).";
     }
-    if (!sameAddress) {
+    if (billAddress) {
       if (!v("billLine1")) return "Scrivi l'indirizzo di fatturazione.";
       if (!/^\d{5}$/.test(v("billPostcode"))) return "Il CAP di fatturazione deve avere 5 cifre.";
       if (!v("billCity")) return "Scrivi la città di fatturazione.";
@@ -236,20 +245,23 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
           firstName: v("firstName"),
           lastName: v("lastName"),
           phone: v("phone"),
-          address: {
-            name,
-            line1: v("line1"),
-            line2: v("line2"),
-            postcode: v("postcode"),
-            city: v("city"),
-            province: v("province").toUpperCase(),
-            country: "IT",
-            phone: v("phone"),
-          },
+          // ritiro in negozio: l'indirizzo è quello del negozio (il server lo rimette comunque)
+          address: pickup
+            ? { name, line1: pickup.line1, line2: pickup.place, postcode: pickup.postcode, city: pickup.city, province: pickup.province, country: "IT", phone: v("phone") }
+            : {
+                name,
+                line1: v("line1"),
+                line2: v("line2"),
+                postcode: v("postcode"),
+                city: v("city"),
+                province: v("province").toUpperCase(),
+                country: "IT",
+                phone: v("phone"),
+              },
           billing: {
             name: company ? v("billName") : name,
             // indirizzo vuoto = uguale alla spedizione
-            ...(sameAddress
+            ...(!billAddress
               ? {}
               : {
                   address: v("billLine1"),
@@ -346,6 +358,32 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
           </div>
         </fieldset>
 
+        {/* Consegna prima dell'indirizzo (24/11/2026): con il ritiro in negozio l'indirizzo non serve */}
+        <fieldset className="co-block">
+          <legend>Consegna</legend>
+          {rates === null && <p className="co-muted">Un attimo…</p>}
+          {rates?.length === 0 && <p className="cf-error">Spedizione non disponibile al momento: riprova tra poco.</p>}
+          {rates?.map((r) => (
+            <label className={`co-option ${r.id === rateId ? "is-on" : ""}`} key={r.id}>
+              <input type="radio" name="rate" checked={r.id === rateId} onChange={() => setRateId(r.id)} />
+              <span>
+                <strong>{r.name}</strong>
+                {r.pickup ? <small>Da {r.pickup.place}</small> : r.estimatedDays && <small>{r.estimatedDays}</small>}
+              </span>
+              <b>{discount?.freeShipping || r.priceCents === 0 ? "Gratis" : formatPrice(r.priceCents)}</b>
+            </label>
+          ))}
+          {pickup && (
+            <div className="co-pickup">
+              <strong>{pickup.place}</strong>
+              <span>{pickup.address}</span>
+              {pickup.hours && <span>{pickup.hours}</span>}
+              <small>Ti scriviamo quando la tua box è pronta da ritirare, di solito dal giorno lavorativo dopo l&apos;ordine.</small>
+            </div>
+          )}
+        </fieldset>
+
+        {!pickup && (
         <fieldset className="co-block">
           <legend>Dove spediamo</legend>
           <label className="cf-field">
@@ -375,6 +413,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
             <textarea name="note" rows={2} maxLength={1000} />
           </label>
         </fieldset>
+        )}
 
         {/* Dati di fatturazione (16/11/2026): indirizzo per tutti; fattura alle aziende e ai privati che danno il codice fiscale */}
         <fieldset className="co-block">
@@ -423,15 +462,18 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
           ) : (
             <label className="cf-field">
               <span>Codice fiscale (facoltativo)</span>
-              <input name="billTax" defaultValue={d.billTax} maxLength={16} autoCapitalize="characters" placeholder="Inseriscilo se vuoi la fattura" />
+              <input name="billTax" defaultValue={d.billTax} maxLength={16} autoCapitalize="characters" placeholder="Inseriscilo se vuoi la fattura" onChange={(e) => setHasTax(e.target.value.trim().length > 0)} />
             </label>
           )}
-          <label className="cf-check">
-            <input type="checkbox" checked={sameAddress} onChange={(e) => setSameAddress(e.target.checked)} />
-            <span>L&apos;indirizzo di fatturazione è uguale a quello di spedizione</span>
-          </label>
-          {!sameAddress && (
+          {!pickup && (
+            <label className="cf-check">
+              <input type="checkbox" checked={sameAddress} onChange={(e) => setSameAddress(e.target.checked)} />
+              <span>L&apos;indirizzo di fatturazione è uguale a quello di spedizione</span>
+            </label>
+          )}
+          {billAddress && (
             <>
+              {pickup && <p className="co-hint">Per la fattura ci serve il tuo indirizzo.</p>}
               <label className="cf-field">
                 <span>Indirizzo di fatturazione</span>
                 <input name="billLine1" defaultValue={d.billLine1} autoComplete="billing address-line1" required placeholder="Via e numero civico" />
@@ -452,22 +494,6 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
               </div>
             </>
           )}
-        </fieldset>
-
-        <fieldset className="co-block">
-          <legend>Spedizione</legend>
-          {rates === null && <p className="co-muted">Un attimo…</p>}
-          {rates?.length === 0 && <p className="cf-error">Spedizione non disponibile al momento: riprova tra poco.</p>}
-          {rates?.map((r) => (
-            <label className={`co-option ${r.id === rateId ? "is-on" : ""}`} key={r.id}>
-              <input type="radio" name="rate" checked={r.id === rateId} onChange={() => setRateId(r.id)} />
-              <span>
-                <strong>{r.name}</strong>
-                {r.estimatedDays && <small>{r.estimatedDays}</small>}
-              </span>
-              <b>{discount?.freeShipping || r.priceCents === 0 ? "Gratis" : formatPrice(r.priceCents)}</b>
-            </label>
-          ))}
         </fieldset>
 
         <fieldset className="co-block">
@@ -573,7 +599,7 @@ export default function Checkout({ testPayment = false, codPayment = false }: { 
             </div>
           )}
           <div>
-            <dt>Spedizione</dt>
+            <dt>{pickup ? "Ritiro in negozio" : "Spedizione"}</dt>
             <dd>{rate ? (shipping ? formatPrice(shipping) : "Gratis") : "–"}</dd>
           </div>
           <div className="co-sum-total">

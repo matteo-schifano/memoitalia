@@ -85,7 +85,7 @@ export const products: Product[] = [
     kind: "barretta",
     sku: "MEMO-BOX12-ARA",
     name: "Arachide",
-    tagline: "La barretta agli arachidi",
+    tagline: "La barretta alle arachidi",
     ingredients: "Arachidi",
     description:
       "Tutto il gusto pieno delle arachidi tostate, in una barretta semplice e saziante. Per chi non si accontenta.",
